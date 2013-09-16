@@ -1,0 +1,31 @@
+        		                                             READ ME
+
+1. A parent process and a child process, concurrently copies a source file into a destination file using the same opened files inherited by the child process from the parent process. By using semaphores mutual exclusion is imposed on the two processes that share the space where the copy is made.
+
+  2. The producer/consumer problem.
+
+Synchronizes the execution of processes of type producer and consumer that are generated continuously and affect a circular message buffer, in a way that the FIFO communication principles are met. „Unread” messages cannot be overwritten and a message cannot be „read” more than once. 
+
+3. Readers/writers problem. Synchronize the execution of two types of processes that share the same resource, in this case a list (sir) of integers: some processes just read from the list – reader process, while others just write into these lists – writer process. The synchronization rules are:
+
+a.      more readers can access the list simultaneously, but not in the same time when writers access it;
+
+b.      writers access the list using mutual exclusion, that is when a writer accesses the list no other process, whether it is a reader or a writer, can access it.
+
+The solution in this example uses a semaphore with a high initial value (greater than the maximum number of readers that can be simultaneously active at a certain moment of time). This semaphore is then decremented by the writers with a value equal to its initial value, so that all permissions are required by the process in order to block all other processes that would also want to access it; reader processes increment it with 1, to block only the writers, but without blocking other readers. 
+
+
+
+Header file used
+
+
+
+#include <sys/types.h>
+
+#include <sys/stat.h>
+
+#include <sys/ipc.h>
+
+#include <sys/sem.h>
+
+#include <fcntl.h>
