@@ -1,0 +1,118 @@
+#define N 100
+#define MUTEX 0
+#define SPACES 1
+#define POSTS 2
+
+int *buffer, *prodMsg, *consMsg;
+
+void P(int semId, int semNr)
+
+{
+
+    struct sembuf op = {semNr, -1, 0};
+
+    semop(semId, &op, 1);
+
+}
+
+void V(int semId, int semNr)
+
+{
+
+    struct sembuf op = {semNr, +1, 0};
+
+    semop(semId, &op, 1);
+
+}
+
+void producer(int idProd, int msg, int semId)
+
+{
+
+    P(semId, SPACES);
+
+    P(semId, MUTEX);
+
+    buffer[*prodMsg] = msg;
+
+    *prodMsg = (*prodMsg + 1) % N;
+
+    printf("Prod.%d msg: %d\n", idProd, msg);
+
+    V(semId, MUTEX);
+
+    V(semId, POSTS);
+
+}
+
+void consumer(int idCons, int *msg, int semId)
+
+{
+
+    P(semId, POSTS);
+
+    P(semId, MUTEX);
+
+    *msg = buffer[*consMsg];
+
+    *consMsg = (*consMsg + 1) % N;
+
+    printf("Cons.%d msg: %d\n", idCons, *msg);
+
+    V(semId, MUTEX);
+
+    V(semId, SPACES);
+
+}
+
+int main(int argc, char **argv)
+
+{
+
+    int semId, shmId, i, pid, msg;
+
+    shmId = shmget(IPC_PRIVATE, (N+2) * sizeof(int),
+
+                   IPC_CREAT | 0600);
+
+    if (shmId < 0)
+
+    { perror("Error creation in shared memory variable"); exit(2); }
+
+    buffer = (int*) shmat(shmId, 0, 0);
+
+    prodMsg = &buffer[N];
+
+    consMsg = &buffer[N+1];
+
+    semId = semget(IPC_PRIVATE, 3, IPC_CREAT | 0600);
+
+    if (semId < 0)
+
+    { perror("Error creation in semaphore"); exit(2); }
+
+    semctl(semId, MUTEX, SETVAL, 1);    // LOCK
+
+    semctl(semId, SPACES, SETVAL, N);   // PRINT PRODUCER
+
+    semctl(semId, POSTS, SETVAL, 0);   // PRINT CONSUMER
+
+    if ((pid = fork()) == 0)    // FREE PRODUCER
+
+        for (i=1; i<=10*N; i++)
+
+            if (fork() == 0)
+
+            { producer(i, i, semId); exit(0); }
+
+    else                       // FREE CONSUMER
+
+        for (i=1; i<=10*N; i++)
+
+            if (fork() == 0)
+
+            { consumer(i, &msg, semId); exit(0); }
+
+}
+
+ 
