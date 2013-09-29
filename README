@@ -1,31 +1,26 @@
-        		                                             READ ME
-
-1. A parent process and a child process, concurrently copies a source file into a destination file using the same opened files inherited by the child process from the parent process. By using semaphores mutual exclusion is imposed on the two processes that share the space where the copy is made.
-
-  2. The producer/consumer problem.
-
-Synchronizes the execution of processes of type producer and consumer that are generated continuously and affect a circular message buffer, in a way that the FIFO communication principles are met. „Unread” messages cannot be overwritten and a message cannot be „read” more than once. 
-
-3. Readers/writers problem. Synchronize the execution of two types of processes that share the same resource, in this case a list (sir) of integers: some processes just read from the list – reader process, while others just write into these lists – writer process. The synchronization rules are:
-
-a.      more readers can access the list simultaneously, but not in the same time when writers access it;
-
-b.      writers access the list using mutual exclusion, that is when a writer accesses the list no other process, whether it is a reader or a writer, can access it.
-
-The solution in this example uses a semaphore with a high initial value (greater than the maximum number of readers that can be simultaneously active at a certain moment of time). This semaphore is then decremented by the writers with a value equal to its initial value, so that all permissions are required by the process in order to block all other processes that would also want to access it; reader processes increment it with 1, to block only the writers, but without blocking other readers. 
+                                                       Read Me
 
 
+Two kinds of processes share a database. Readers execute transactions that examine 
+database records; writer transactions both examine and update the database. The database is assumed initially to 
+be in a consistent state (i.e., one in which relations between data are meaningful). Each transaction, if executed 
+in isolation, transforms the database from one consistent state to another. To preclude interference between transactions, 
+a writer process must have exclusive access to the database. Assuming no writer is accessing the database, any number of 
+readers may concurrently execute transactions.
 
-Header file used
+This problem is implemented in JAVA language, in this problem there is 4 main classes:
+        
+       1st class is barber- in this class Barber implements his work to customers and also calculated average time that
+       how much time barber takes on 1 customer.
+       
+       2nd class is BarberShop- in this class it shows that how many chairs is available and how many are vacant among them
+       and also show that how many customers are there in shop etc.
+
+       3rd class is CustomerGenerator- in this class it shows that when the custumer arrives and leaves, how much time he
+       takes for his haircut, etc.
+
+       4th class is ProgressTracking- in this class it shows the total progress of the shop means how many customers came 
+       to take haircut, how many customers are lost, whats the progress.
 
 
-
-#include <sys/types.h>
-
-#include <sys/stat.h>
-
-#include <sys/ipc.h>
-
-#include <sys/sem.h>
-
-#include <fcntl.h>
+In this problems there is some threads also using wherever required..
